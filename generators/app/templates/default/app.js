@@ -1,0 +1,1 @@
+Rice.init().controller("main")

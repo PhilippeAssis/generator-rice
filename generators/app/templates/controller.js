@@ -1,0 +1,5 @@
+Rice.addController("<%= name  %>", () => {
+    
+    
+    
+})

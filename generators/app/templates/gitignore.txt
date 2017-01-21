@@ -1,0 +1,4 @@
+node_modules
+bower_modules
+.c9
+*.log

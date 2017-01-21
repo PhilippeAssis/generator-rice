@@ -1,0 +1,3 @@
+Rice.addController("home", () => {
+    
+})
