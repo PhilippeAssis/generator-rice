@@ -23,6 +23,16 @@ module.exports = Generator.extend({
       name: 'appname',
       message: 'Your project name',
       default: this.appname
+    }, {
+      type: 'input',
+      name: 'apppath',
+      message: 'Project directory name',
+      default: 'app'
+    }, {
+      type: 'input',
+      name: 'publicpath',
+      message: 'Public directory name',
+      default: 'public'
     }];
 
     return this.prompt(prompts).then(function(props) {
@@ -54,17 +64,22 @@ module.exports = Generator.extend({
 
     this.fs.copy(
       this.templatePath('default'),
-      this.destinationPath('./app')
+      this.destinationPath(`./${this.props.apppath}`)
     );
 
-    this.fs.copy(
+    this.fs.copyTpl(
       this.templatePath('gulpfile.js'),
-      this.destinationPath('gulpfile.js')
+      this.destinationPath('gulpfile.js'), {
+        "apppath": this.props.apppath,
+        "publicpath": this.props.publicpath
+      }
     );
 
-    this.fs.copy(
+    this.fs.copyTpl(
       this.templatePath('gitignore.txt'),
-      this.destinationPath('.gitignore')
+      this.destinationPath('.gitignore'),{
+        "publicpath": this.props.publicpath
+      }
     );
   },
 
@@ -72,6 +87,15 @@ module.exports = Generator.extend({
   install() {
     this.npmInstall(['ricejs'], {
       'save': true
+    });
+
+    this.npmInstall(['gulp', 'gulp-autowatch',
+      'gulp-clean', 'gulp-clean-css', 'gulp-concat',
+      'gulp-less', 'gulp-stylus',
+      'gulp-livereload', 'gulp-plumber', 'gulp-pug', 'gulp-sourcemaps',
+      'gulp-babel', 'babel-preset-env', 'babel-cli'
+    ], {
+      'save-dev': true
     });
 
     this.installDependencies({

@@ -1,3 +1,0 @@
-Rice.addService("twitter", () => {
-    
-})

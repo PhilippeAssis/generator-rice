@@ -9,71 +9,73 @@ var plumber = require('gulp-plumber');
 var clean = require('gulp-clean');
 var livereload = require('gulp-livereload');
 var sourcemaps = require('gulp-sourcemaps');
+var babel = require("gulp-babel");
 
 gulp.task('stylus', function() {
-    gulp.src('./styles/*.styl')
+    gulp.src('./<%= apppath  %>/styles/*.styl')
         .pipe(plumber())
         .pipe(stylus({
             'include css': true
         }))
         .pipe(cleanCSS())
-        .pipe(gulp.dest('./public/css'))
+        .pipe(gulp.dest('./<%= publicpath  %>/css'))
         .pipe(livereload());
 });
 
 gulp.task('less', function() {
-    gulp.src('./styles/*.less')
+    gulp.src('./<%= apppath  %>/styles/*.less')
         .pipe(plumber())
         .pipe(less())
         .pipe(cleanCSS())
-        .pipe(gulp.dest('./public/css'))
+        .pipe(gulp.dest('./<%= publicpath  %>/css'))
         .pipe(livereload());
 });
 
 gulp.task('views', function() {
-    gulp.src('./public/*.html')
+    gulp.src('./<%= publicpath  %>/*.html')
         .pipe(clean())
 
-    gulp.src('./views/templates/*.pug')
+    gulp.src('./<%= apppath  %>/views/templates/*.pug')
         .pipe(plumber())
         .pipe(pug())
-        .pipe(gulp.dest('./public'))
+        .pipe(gulp.dest('./<%= publicpath  %>'))
         .pipe(livereload());
 })
 
 gulp.task('scripts', function() {
     gulp.src([
-            './vendor/*.js',
-            './libs/*.js',
-            './services/*.js',
-            './controllers/*.js',
-            './configs/*.js',
-            './app.js'
+            './<%= apppath  %>/vendor/*.js',
+            './<%= apppath  %>/libs/*.js',
+            './<%= apppath  %>/services/*.js',
+            './<%= apppath  %>/controllers/*.js',
+            './<%= apppath  %>/configs/*.js',
+            './<%= apppath  %>/app.js'
         ])
         .pipe(plumber())
+        .pipe(sourcemaps.init())
+        .pipe(babel({presets: ['env']}))
         .pipe(concat('app.js'))
-        .pipe(sourcemaps.write())
-        .pipe(gulp.dest('./public/js'))
+        .pipe(sourcemaps.write("."))
+        .pipe(gulp.dest('./<%= publicpath  %>/js'))
         .pipe(livereload());
 })
 
 gulp.task('vendor', function() {
     gulp.src([
-            './node_modules/ricejs/dist/rice.min.js',
-            './bower_components/ricejs/dist/rice.min.js'
+            './node_modules/ricejs/dist/rice.min.js'
         ])
         .pipe(plumber())
         .pipe(concat('vendor.js'))
-        .pipe(gulp.dest('./public/js'))
+        .pipe(gulp.dest('./<%= publicpath  %>/js'))
         .pipe(livereload());
 });
 
 gulp.task('watch', function() {
     autowatch(gulp, {
-        'views': './views/**/*.pug',
-        'scripts': ['./**/*.js', './**/**/*.js', './**/**/**/*.js'],
-        'stylus': ['./styles/*.styl', './styles/**/*.styl'],
-        'less': ['./styles/*.less', './styles/**/*.less']
+        'views': './<%= apppath  %>/views/**/*.pug',
+        'scripts': ['./<%= apppath  %>/**/*.js', './<%= apppath  %>/**/**/*.js', './<%= apppath  %>/**/**/**/*.js'],
+        'stylus': ['./<%= apppath  %>/styles/*.styl', './<%= apppath  %>/styles/**/*.styl'],
+        'less': ['./<%= apppath  %>/styles/*.less', './<%= apppath  %>/styles/**/*.less']
     });
 });
 
