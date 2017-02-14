@@ -1,5 +1,5 @@
 Rice.addController("<%= name  %>", () => {
-    
-    
-    
+
+
+
 })

@@ -3,7 +3,17 @@ var Generator = require('yeoman-generator');
 var chalk = require('chalk');
 var yosay = require('yosay');
 
-module.exports = Generator.extend({
+module.exports = class extends Generator {
+
+  constructor(args, opts) {
+    super(args, opts);
+
+    // This method adds support for a `--coffee` flag
+    this.option("controller")
+
+    this.option("services")
+  }
+
   init() {
     this.log(yosay(
       chalk.green('Welcome to rice!')
@@ -18,29 +28,67 @@ module.exports = Generator.extend({
       return;
     }
 
-    var prompts = [{
-      type: 'input',
-      name: 'appname',
-      message: 'Your project name',
-      default: this.appname
-    }, {
-      type: 'input',
-      name: 'apppath',
-      message: 'Project directory name',
-      default: 'app'
-    }, {
-      type: 'input',
-      name: 'publicpath',
-      message: 'Public directory name',
-      default: 'public'
-    }];
+    if (this.options.controller) {
+      var prompts = [{
+        type: 'input',
+        name: 'controllername',
+        message: 'Your controller name',
+        default: this.appname
+      }]
+    }
+    else if (this.options.services) {
+      var prompts = [{
+        type: 'input',
+        name: 'servicesname',
+        message: 'Your services name',
+        default: this.appname
+      }]
+    }
+    else {
+      var prompts = [{
+        type: 'input',
+        name: 'appname',
+        message: 'Your project name',
+        default: this.appname
+      }, {
+        type: 'input',
+        name: 'apppath',
+        message: 'Project directory name',
+        default: 'app'
+      }, {
+        type: 'input',
+        name: 'publicpath',
+        message: 'Public directory name',
+        default: 'public'
+      }];
+    }
 
     return this.prompt(prompts).then(function(props) {
       this.props = props;
     }.bind(this));
-  },
+  }
 
   writing() {
+    if (this.options.controller) {
+      this.fs.copyTpl(
+        this.templatePath('controller.js'),
+        this.destinationPath(`controllers/${this.props.controllername}Controller.js`), {
+          "name": this.props.controllername
+        }
+      );
+      return;
+    }
+
+    if (this.options.services) {
+      this.fs.copyTpl(
+        this.templatePath('service.js'),
+        this.destinationPath(`services/${this.props.servicesname}Service.js`), {
+          "name": this.props.servicesname
+        }
+      );
+      return;
+    }
+
     if (this.options && this.options.args) {
       var name = (this.options.args[1]) ? this.options.args[1] : this.options.name,
         filename = name + this.options.args[0].substr(0, 1).toUpperCase() + this.options.args[0].substr(1)
@@ -51,7 +99,6 @@ module.exports = Generator.extend({
           name: (this.options.args[1]) ? this.options.args[1] : this.options.name
         }
       );
-
       return;
     }
 
@@ -77,14 +124,17 @@ module.exports = Generator.extend({
 
     this.fs.copyTpl(
       this.templatePath('gitignore.txt'),
-      this.destinationPath('.gitignore'),{
+      this.destinationPath('.gitignore'), {
         "publicpath": this.props.publicpath
       }
     );
-  },
-
+  }
 
   install() {
+    if (this.options.controller) {
+      return;
+    }
+
     this.npmInstall(['ricejs'], {
       'save': true
     });
@@ -93,7 +143,7 @@ module.exports = Generator.extend({
       'gulp-clean', 'gulp-clean-css', 'gulp-concat',
       'gulp-less', 'gulp-stylus',
       'gulp-livereload', 'gulp-plumber', 'gulp-pug', 'gulp-sourcemaps',
-      'gulp-babel', 'babel-preset-env', 'babel-cli'
+      'gulp-babel', 'babel-preset-env', 'babel-cli', 'gulp-action-comment'
     ], {
       'save-dev': true
     });
@@ -106,4 +156,4 @@ module.exports = Generator.extend({
 
     this.log("All set, good luck.")
   }
-});
+}

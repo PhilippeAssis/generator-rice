@@ -5,9 +5,16 @@ Rice.addService("<%= name  %>", () => {
     }
     
     this.stop = (next) => {
-        next()
+        next(null)
+    }
+    
+    this.restart = (next) => {
+        next(null)
+    }
+    
+    this.reload = (next) => {
+        next(null)
     }
     
     return this;
-    
 })

@@ -10,6 +10,7 @@ var clean = require('gulp-clean');
 var livereload = require('gulp-livereload');
 var sourcemaps = require('gulp-sourcemaps');
 var babel = require("gulp-babel");
+var actionComment = require("gulp-action-comment");
 
 gulp.task('stylus', function() {
     gulp.src('./<%= apppath  %>/styles/*.styl')
@@ -52,6 +53,7 @@ gulp.task('scripts', function() {
             './<%= apppath  %>/app.js'
         ])
         .pipe(plumber())
+        .pipe(actionComment())
         .pipe(sourcemaps.init())
         .pipe(babel({presets: ['env']}))
         .pipe(concat('app.js'))
