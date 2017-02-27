@@ -55,7 +55,9 @@ gulp.task('scripts', function() {
         .pipe(plumber())
         .pipe(actionComment())
         .pipe(sourcemaps.init())
-        .pipe(babel({presets: ['env']}))
+        .pipe(babel({
+            presets: ['env']
+        }))
         .pipe(concat('app.js'))
         .pipe(sourcemaps.write("."))
         .pipe(gulp.dest('./<%= publicpath  %>/js'))

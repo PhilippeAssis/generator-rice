@@ -12,6 +12,8 @@ module.exports = class extends Generator {
     this.option("controller")
 
     this.option("services")
+
+    this.option("bootstrap")
   }
 
   init() {
@@ -61,6 +63,16 @@ module.exports = class extends Generator {
         message: 'Public directory name',
         default: 'public'
       }];
+
+      if (this.options.bootstrap) {
+        prompts.push({
+          type: 'list',
+          name: 'theme',
+          message: 'Set bootstrap theme',
+          default: 'paper',
+          choices: ["cerulean", "cosmo", "cyborg", "darkly", "flatly", "journal", "lumen", "paper", "readable", "sandstone", "simplex", "slate", "spacelab", "superhero", "united", "yeti", "fonts"].sort()
+        })
+      }
     }
 
     return this.prompt(prompts).then(function(props) {
@@ -128,6 +140,20 @@ module.exports = class extends Generator {
         "publicpath": this.props.publicpath
       }
     );
+
+    if (this.options.bootstrap) {
+      this.fs.copyTpl(
+        this.templatePath('bootstrap/styles/app.styl'),
+        this.destinationPath(`./${this.props.apppath}/styles/app.styl`), {
+          "theme": this.props.theme
+        }
+      );
+
+      this.fs.copy(
+        this.templatePath('bootstrap/views/templates/index.pug'),
+        this.destinationPath(`./${this.props.apppath}/views/templates/index.pug`)
+      );
+    }
   }
 
   install() {
@@ -139,12 +165,18 @@ module.exports = class extends Generator {
       'save': true
     });
 
-    this.npmInstall(['gulp', 'gulp-autowatch',
+    var modulesDev = ['gulp', 'gulp-autowatch',
       'gulp-clean', 'gulp-clean-css', 'gulp-concat',
       'gulp-less', 'gulp-stylus',
       'gulp-livereload', 'gulp-plumber', 'gulp-pug', 'gulp-sourcemaps',
       'gulp-babel', 'babel-preset-env', 'babel-cli', 'gulp-action-comment'
-    ], {
+    ]
+
+    if (this.options.bootstrap) {
+      modulesDev.push("bootswatch")
+    }
+
+    this.npmInstall(modulesDev, {
       'save-dev': true
     });
 
